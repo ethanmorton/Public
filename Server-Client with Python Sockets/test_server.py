@@ -1,6 +1,5 @@
 import socket
 from threading import Thread, Lock, active_count
-from server_support import *
 from cmd import Cmd
 
 HEADER = 64
@@ -18,14 +17,26 @@ server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 server.bind(ADDR)
 
+#thread dictionary needed because each connection runs on its own thread, and is difficult to access in order to send information independent of the recieving loop
 thread_dict = {}
 
 go = True
 
 def removekey(key):
+    '''
+    for removing an entry from the thread dictionary
+    '''
     del thread_dict[key]
 
 def send(conn, msg):
+    '''
+    to send a message to the client
+
+    first encodes the message, then sends a message with specified length HEADER that contains 
+    the length of the next message, then send the next message
+
+    Handles one exception, ValueError, in case the for some reason that flag is thrown
+    '''
     try:
         message = msg.encode(FORMAT)
         msg_length = len(message)
@@ -37,6 +48,16 @@ def send(conn, msg):
         print(e)
 
 def handle_client(conn, addr):
+    '''
+    the standard function for each connection from a client
+
+    conn - the connection object that is returned from a successful connection
+    addr - the ip and port the connection is connecting from, in a tuple :: (IP, PORT)
+
+    runs a while loop until a specific message, the DISCONNECT_MESSAGE is sent from the client, at which point the loop wil and and the connection will terminate
+
+    meant to specifically recieve and decode messages from the client side
+    '''
     try:
         print(f"New connection.\n{addr} connected with alias {thread_dict[conn][1]}.")
         connected = True
@@ -62,9 +83,18 @@ def handle_client(conn, addr):
 
 
 def start():
+    '''
+    the start function is the main loop of the server. it listens for a 
+    connection until the go variable is False(currently not implmented)
+
+    every time a connection is made, the start function adds the relevant 
+    data to the thread_dict as well as accepting the first transmission, 
+    which is the name, and then starts a thread to handle that connection
+
+    it currently does not handle any errors
+    '''
     print(f"Started server, listening on {ADDR}\n")
     server.listen()
-    num = 0
     while go:
         conn, addr = server.accept()
         thread = Thread(target=handle_client, args=(conn, addr))
@@ -74,9 +104,13 @@ def start():
 
         thread.start()
         print(f"Active connections: {active_count() - 3}")
-        num += 1
 
 class terminal(Cmd):
+    '''
+    this class is intended for displaying information and allowing the server side user to directly interact with clients and data
+
+    it creates an interactive terminal in the comand prompt that this script is run in
+    '''
     prompt = '<Server> : '
     intro = "Server input thread has started. '?' or 'help' for a list of commands."
     def do_exit(self, inp):
@@ -111,6 +145,9 @@ class terminal(Cmd):
         print("prints the current connections to their console, and associated names")
 
 def server_send():
+    '''
+    the function for using the cmd terminal in a separate thread
+    '''
     term = terminal()
     term.cmdloop()
     print("Server input thread exited.")
