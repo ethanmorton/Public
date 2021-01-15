@@ -79,6 +79,7 @@ def handle_client(conn, addr):
                 print("There was a problem determining the length of the message.")
     except ConnectionResetError as e:
         print("The connection was terminated by the connectee.")
+        del thread_dict[conn]
     conn.close()
 
 

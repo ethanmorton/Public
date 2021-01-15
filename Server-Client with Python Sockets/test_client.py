@@ -13,7 +13,7 @@ SELF = socket.gethostbyname(socket.gethostname()) #get self ip by name
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client.connect(ADDR)
-
+connect = True
 def send(msg):
     '''
     sending a message to the server
@@ -46,15 +46,16 @@ def recieve():
     it does not currently handle decoding errors
     '''
     print("Connected to server")
-    msg_length = client.recv(HEADER).decode(FORMAT)
-    msg = client.recv(int(msg_length)).decode(FORMAT)
-    print(msg, "\n")
+    while connect:
+        msg_length = client.recv(HEADER).decode(FORMAT)
+        msg = client.recv(int(msg_length)).decode(FORMAT)
+        print(msg, "\n")
 
 def start():
     '''
     the start function us the main client side loop, it asks for a name, then sends it to the 
     server, and begins the loop of asking if a message should be sent. if declined, it will 
-    send the DISCONNECT_MESSAGE and he server will close the connection.
+    send the DISCONNECT_MESSAGE and the server will close the connection.
 
     it does not currently handle any errors
     '''
