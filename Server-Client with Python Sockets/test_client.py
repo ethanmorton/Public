@@ -12,8 +12,12 @@ ADDR = (SERVER, PORT)
 SELF = socket.gethostbyname(socket.gethostname()) #get self ip by name
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client.connect(ADDR)
-connect = True
+try:
+    client.connect(ADDR)
+except ConnectionRefusedError as e:
+    print("Connection to the server could not be established")
+    exit(0)
+
 def send(msg):
     '''
     sending a message to the server
@@ -45,11 +49,39 @@ def recieve():
 
     it does not currently handle decoding errors
     '''
-    print("Connected to server")
+    connect = True
     while connect:
-        msg_length = client.recv(HEADER).decode(FORMAT)
-        msg = client.recv(int(msg_length)).decode(FORMAT)
-        print(msg, "\n")
+        try:
+            msg_length = client.recv(HEADER).decode(FORMAT)
+            msg = client.recv(int(msg_length)).decode(FORMAT)
+            print(msg, "\n")
+            if msg == "Disconnecting from server...":
+                connect = False
+        except ValueError as e:
+            print("There was a ValueError exception in the Recieve funtion")
+            connect = False
+        except ConnectionResetError as e:
+            print("The connection was forcibly terminated, who even knows what went wrong tbh")
+            connect = False
+
+class terminal(Cmd):
+    prompt = "<Client> : "
+    intro = "Client input thread. '?' or 'help' for a list of commands."
+    def do_exit(self, inp):
+        print("Bye!.")
+        return True
+    
+    def help_exit(self):
+        print("Usage :: exit")
+        print("Exits the running console.")
+    
+    def do_send(self, inp):
+        send(inp)
+    
+    def help_send(self):
+        print("Usage :: send [message]")
+        print("Sends a message to the connected server")
+
 
 def start():
     '''
@@ -63,17 +95,11 @@ def start():
     name = input("Please enter a name to be referred to:\n")
     send(name)
 
-    while True:
-        inp = input("Would you like to send a message?\n")
-        if inp == "Y":
-            send(input("Please type it below.\n"))
-        elif inp == "N":
-            print("OK")
-            send("!DISCONNECT")
-            print("Disconnected")
-            break
-        else:
-            print("I didn't quite catch that.")
+    cmd = terminal()
+    cmd.cmdloop()
+    print("Client input thread exited")
+
+    
 
 
 recv = Thread(target=recieve)

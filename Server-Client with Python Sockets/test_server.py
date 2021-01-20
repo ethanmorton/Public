@@ -38,6 +38,7 @@ def send(conn, msg):
     Handles one exception, ValueError, in case the for some reason that flag is thrown
     '''
     try:
+        msg = msg + "\n"
         message = msg.encode(FORMAT)
         msg_length = len(message)
         send_length = str(msg_length).encode(FORMAT)
@@ -78,8 +79,9 @@ def handle_client(conn, addr):
             except ValueError as v:
                 print("There was a problem determining the length of the message.")
     except ConnectionResetError as e:
+        print(f"{thread_dict[conn][1]} has disconnected unexpectedly")
         print("The connection was terminated by the connectee.")
-        del thread_dict[conn]
+        removekey(conn)
     conn.close()
 
 
@@ -92,19 +94,23 @@ def start():
     data to the thread_dict as well as accepting the first transmission, 
     which is the name, and then starts a thread to handle that connection
 
-    it currently does not handle any errors
+    handles an unesxpected disconnection from client side
     '''
     print(f"Started server, listening on {ADDR}\n")
     server.listen()
     while go:
-        conn, addr = server.accept()
-        thread = Thread(target=handle_client, args=(conn, addr))
-        msg_length = int(conn.recv(HEADER).decode(FORMAT))
-        name = conn.recv(msg_length).decode(FORMAT)
-        thread_dict[conn] = [addr, name]
+        try:
+            conn, addr = server.accept()
+            thread = Thread(target=handle_client, args=(conn, addr))
+            msg_length = int(conn.recv(HEADER).decode(FORMAT))
+            name = conn.recv(msg_length).decode(FORMAT)
+            thread_dict[conn] = [addr, name]
+            send(conn, "Connected to server")
 
-        thread.start()
-        print(f"Active connections: {active_count() - 3}")
+            thread.start()
+            print(f"Active connections: {active_count() - 3}")
+        except ConnectionResetError as e:
+            print(f"connection :: ", conn, "\nwith address :: ", addr, "\n terminated forcibly by the client side")
 
 class terminal(Cmd):
     '''
