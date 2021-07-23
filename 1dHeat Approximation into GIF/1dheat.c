@@ -22,7 +22,7 @@ void initialize_x(int m, double arr[m], double dx)
 {
     for (size_t i = 0; i < m; i++)
     {
-        arr[i] = (double) i / (double) m;
+        arr[i] = i / (double) m;/*.5 * sin(M_PI * 2.0 * dx * (double)i) + .5;*/
     }
 }
 
@@ -87,6 +87,16 @@ void draw_line_vert(ge_GIF *gif, int x, int m)
     }
 }
 
+/**
+ * @brief draws a straight line between two given points
+ * 
+ * @param gif pointer to gif struct
+ * @param x1 x value of leftmost point
+ * @param y1 y value of leftmost point
+ * @param x2 x value of rightmost point
+ * @param y2 y value of rightmost point
+ * @param m color of line, from gif palette
+ */
 void draw_line_p2p(ge_GIF *gif, int x1, int y1, int x2, int y2, int m)
 {
     double slope = (y2 - y1) / (x2 - x1);
@@ -139,8 +149,8 @@ int main(int argc, char const *argv[])
             0x00, 0x00, 0xFF, /* 3 -> blue  */
     };
 
-    int res_width = 960;
-    int res_height = 960;
+    int res_width = 540;
+    int res_height = 540;
     int left_buffer = 100;
     /*bottom buffer needs to be subtracted because the gif writes top to bottom. So the bottom is res_height, and up is down, and 100 pixels up from the bottom is res_height - 100*/
     int bottom_buffer = res_height - 100;
@@ -168,7 +178,7 @@ int main(int argc, char const *argv[])
         {
             u_new[j] = coef * (u_old[j+1] - 2*u_old[j] + u_old[j-1]) + u_old[j];
         }
-
+        
         if (i % 999 == 0)
         {
             initialize_frame(gif, 2);
@@ -176,15 +186,17 @@ int main(int argc, char const *argv[])
             draw_line_vert(gif, left_buffer, 0);
             
             /*write graph*/
-            for (size_t i = 0; i < n; i++)
+            for (size_t k = 0; k < n; k++)
             {
-                draw_line_p2p(gif, left_buffer + i * xint_length, bottom_buffer - u_new[i] * yint_length, left_buffer + (i + 1) * xint_length, bottom_buffer - u_new[(i + 1)] * yint_length, 3);
+                draw_line_p2p(gif, left_buffer + k * xint_length, bottom_buffer - u_new[k] * yint_length, left_buffer + (k + 1) * xint_length, bottom_buffer - u_new[(k + 1)] * yint_length, 3);
             }
 
             ge_add_frame(gif, 1);
         }
 
-        memcpy(u_new, u_old, n * sizeof(double));
+        memcpy(u_old, u_new, n * sizeof(double));
+        u_old[0] = 0;
+        u_old[n] = 0;
     }
 
     print_arr(xintervals + 1, u_old);
