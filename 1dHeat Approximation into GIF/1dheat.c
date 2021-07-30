@@ -8,7 +8,7 @@
 
 
 /**
- * @brief fills an array with step size dx at position i and applying sin(2 * pi * i * dx)
+ * @brief fills an array with step size dx at position i and applying a pre-commpile defined initial conditions
  * 
  * @param m length of array
  * @param arr array
@@ -22,7 +22,24 @@ void initialize_x(int m, double arr[m], double dx)
 {
     for (size_t i = 0; i < m; i++)
     {
-        arr[i] = i / (double) m;/*.5 * sin(M_PI * 2.0 * dx * (double)i) + .5;*/
+        arr[i] = 0-i/((double)m) + 1;
+    }
+}
+
+/**
+ * @brief approximate the next time step of a 1d heat equation, given an array of old heat values and the coefficient of heat transfer
+ * 
+ * @param n size of arrays
+ * @param u_new the array which will hold the newly approximated heat values for the next timestep
+ * @param u_old the array of previous heat values, from current timestep
+ * @param xintervals the number of intervals of x, ie the precision
+ * @param coef the coefficient of heat transfer
+ */
+void approximate(int n, double u_new[n], double u_old[n], int xintervals, double coef)
+{
+    for (size_t j = 1; j < xintervals; j++)
+    {
+            u_new[j] = coef * (u_old[j+1] - 2*u_old[j] + u_old[j-1]) + u_old[j];
     }
 }
 
@@ -102,8 +119,11 @@ void draw_line_p2p(ge_GIF *gif, int x1, int y1, int x2, int y2, int m)
     double slope = (y2 - y1) / (x2 - x1);
     for (size_t i = 0; i < x2 -x1; i++)
     {
-        /*          |original point|     |added length for next point|     */
-        gif->frame[(y1 * gif->w + x1) + (i + (int)(i * slope * gif->w))] = m;
+        if (!(y2 > gif->h || y2 < 0 || y1 > gif->h || y1 < 0 || x2 > gif->w || x2 < 0 || x1 > gif->w || x1 < 0))
+        {
+            /*           |original point|       |added length for next point|     */
+            gif->frame[ (y1 * gif->w + x1)  +  (i + (int)(i * slope * gif->w)) ] = m;
+        }
     }
 }
 
@@ -174,21 +194,20 @@ int main(int argc, char const *argv[])
     
     for (size_t i = 0; i < timesteps; i++)
     {
-        for (size_t j = 1; j < (xintervals); j++)
-        {
-            u_new[j] = coef * (u_old[j+1] - 2*u_old[j] + u_old[j-1]) + u_old[j];
-        }
+        approximate(n, u_new, u_old, xintervals, coef);
         
+        /*check to render frame, if true then render frame*/
         if (i % 999 == 0)
         {
+            /*draw background and initial graph lines*/
             initialize_frame(gif, 2);
             draw_line_hor(gif, bottom_buffer, 0);
             draw_line_vert(gif, left_buffer, 0);
             
-            /*write graph*/
+            /*write graph by drawing lines from u_new[k] to u_new[k+1]*/
             for (size_t k = 0; k < n; k++)
             {
-                draw_line_p2p(gif, left_buffer + k * xint_length, bottom_buffer - u_new[k] * yint_length, left_buffer + (k + 1) * xint_length, bottom_buffer - u_new[(k + 1)] * yint_length, 3);
+                draw_line_p2p(gif, left_buffer + (int)round(k * xint_length), bottom_buffer - (int)round(u_new[k] * yint_length), left_buffer + (int)round((k + 1) * xint_length), bottom_buffer - (int)round(u_new[(k + 1)] * yint_length), 3);
             }
 
             ge_add_frame(gif, 1);
