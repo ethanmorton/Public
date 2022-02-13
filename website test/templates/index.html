@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title%}Landing Page{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="heading">
+        <h1>Drake University Wellmark Mentorship Program</h1>
+        <h4 style="color: #c5c6d6;">LANDING PAGE</h4>
+    </div>
+    <br>
+    <br>
+    <div style="margin-left: 20%; margin-right: 20%; margin-bottom: 20%;">
+        <p>
+            The Drake-Wellmark Mentor partnership is part of a new paradigm in college education, in 
+            which top schools pair with employers to help give students experience in a particular 
+            field of interest. Click "Learn More" to get involved, or sign up for our mailing list below.
+        </p>
+        <form action="/info">
+          <button type="submit" class="btn btn-primary">Learn More</button>
+        </form>
+    </div>
+    <div>
+        <form class="row g-3" method="POST">
+            <div class="col-md-4">
+              <label for="validationDefault01" class="form-label">First name</label>
+              <input type="text" name="first name" class="form-control" id="validationDefault01" value="Mark" required>
+            </div>
+            <div class="col-md-4">
+              <label for="validationDefault02" class="form-label">Last name</label>
+              <input type="text" name="last name" class="form-control" id="validationDefault02" value="Otto" required>
+            </div>
+            <div class="col-md-8">
+              <label for="inputEmail" class="visually-hidden">Email address</label>
+              <input type="email" name="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+            </div>
+            <br>
+            <div class="col-md-5">
+              <label for="validationDefault03" class="form-label">City</label>
+              <input type="text" name="city" class="form-control" id="validationDefault03" required>
+            </div>
+            <div class="col-md-4">
+              <label for="validationDefault04" class="form-label">State</label>
+              <select class="form-select" name="state" id="validationDefault04" required>
+                <option selected disabled value="">Choose...</option>
+                {% for x in state_list%}
+                <option> {{x}} </option>
+                {% endfor %}
+                <option>...</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label for="validationDefault05" class="form-label">Zip</label>
+              <input type="text" name="zip" class="form-control" id="validationDefault05" required>
+            </div>
+            <div class="col-12">
+              <div class="form-check">
+                <input class="form-check-input" name="tos" type="checkbox" value="" id="invalidCheck2" required>
+                <label class="form-check-label" for="invalidCheck2">
+                  Agree to terms and conditions
+                </label>
+              </div>
+            </div>
+            <div class="col-12">
+              <button class="btn btn-primary" type="submit">Add to Mailing List</button>
+            </div>
+          </form>
+          <br>
+          <br>
+          <br>
+          <br>
+    </div>
+</div>
+{% endblock %}

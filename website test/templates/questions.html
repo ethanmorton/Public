@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Question and Answer Board{% endblock %}
+{% block content %}
+<div class="container">
+  <h3>Post a Question</h3>
+</div>
+
+<div class="container">
+
+    <div class="accordion" id="accordionExample">
+        <br>
+        <br>
+        <br>
+            {% if post_list == null %}
+                <div class="container">
+                    <h4>There are no posts to show.</h4>
+                </div>
+                <br>
+                <br>
+                <br>
+            {% else %}
+                {% for x in post_list %}
+                  <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            Question
+                            </button>
+                        </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                      <div class="accordion-body">
+                        {{x.post_content}}
+                      </div>
+                    </div>
+                  </div>
+                {% endfor %}
+            {% endif %}
+      </div>
+    <form action="/issueconfirm" method="POST">
+      <div class="mb-3">
+        <label for="exampleFormControlInput1" class="form-label">Email address</label>
+        <input type="email" name="email" class="form-control" id="exampleFormControlInput1" placeholder="name@example.com">
+    </div>
+    <div class="mb-3">
+        <label for="exampleFormControlTextarea1" class="form-label">Post your question about the program, general info, or life itself.</label>
+        <textarea class="form-control" name="question" id="exampleFormControlTextarea1" rows="3"></textarea>
+    </div>
+    <div class="col-12">
+      <button class="btn btn-primary" type="submit">Submit</button>
+    </div>
+    </form>
+    <br>
+    <br>
+</div>
+{% endblock %}
