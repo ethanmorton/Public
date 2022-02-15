@@ -1,1 +1,0 @@
-gcc project1.c -lm -o project1
