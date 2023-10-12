@@ -1,0 +1,9 @@
+ 1.d0       - pos_e(1)  = Earth initial position
+ 5.2d0      - pos_j(1)  = Jupiter initial position
+ 0.017d0    - e_e       = Earth eccentricity
+ 0.048d0    - e_j       = Jupiter eccentricity
+ 6.0e24     - me        = Earth mass
+ 1.9e30     - mj        = Jupiter mass
+ 2.0e30     - ms        = Sun mass
+ 0.00001d0  - dt        = Time step (years)
+ 2000000    - nt        = Number of time steps

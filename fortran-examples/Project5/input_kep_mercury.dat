@@ -1,0 +1,9 @@
+0.00001d0   - dt        = Time step (years)
+3           - n         = Number of orbits
+0.206d0     - e         = Ellipticity
+0.39d0      - a         = Semimajor axis
+2.000d0     - b         = Beta
+0           - euler     = Toggle for Euler method
+0           - manual    = Toggle to manually set initial values
+0.5d0       - x         = Manually set initial position 
+3.14d0      - vy(1)     = Manually set initial velocity

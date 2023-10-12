@@ -1,0 +1,7 @@
+1.036            - initial phi (rad)
+-2.150           - initial omega, w
+200000          - num periods, nperiods
+800             - num points per period, npp
+0.2d0           - damping constant, kappa
+1.036         - force amplitude, q
+2.0d0           - force frequency, Omega

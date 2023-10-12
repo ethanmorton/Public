@@ -1,0 +1,3 @@
+0.1d0       - h     = dx/scale size
+400         - grid  = size of the grid (grid x grid)
+200000      - nmax  = max number of iterations
